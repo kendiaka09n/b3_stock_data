@@ -87,12 +87,10 @@ def _output_path(ticker: str) -> str:
     nome = ticker.replace('^', '').replace('.SA', '')
 
     if env == 'dev':
-                   bucket = os.getenv("STORAGE_BUCKET")
-                   return f"s3://{bucket}/delta/stocks/{nome}_{formatado}.parquet"
-             #elif enviroment == 'prod'
-             #    os.getenv("STORAGE_BUCKET_PROD")
+        bucket = os.getenv("STORAGE_BUCKET")
+        return f"s3://{bucket}/delta/stocks/{nome}_{formatado}.parquet"
     else:
-      raise NotImplementedError('prod not configured yet')
+        raise NotImplementedError('prod not configured yet')
       
 
 def validar_schema(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
