@@ -73,6 +73,27 @@ pasta_do_script = Path(__file__).parent
 
 
 # --- Funções ---
+def _storage_options() -> dict:
+    return {
+        "endpoint_url": os.getenv('MINIO_ENDPOINT'),
+        "aws_access_key_id": os.getenv('MINIO_ACCESS_KEY'),
+        "aws_secret_access_key": os.getenv('MINIO_SECRET_KEY'),
+        "aws_allow_http": "true",   # MinIO runs HTTP, not HTTPS locally
+    }
+
+ 
+def _output_path(ticker: str) -> str:
+    env = os.getenv('ENV','dev')
+    nome = ticker.replace('^', '').replace('.SA', '')
+
+    if env == 'dev':
+                   bucket = os.getenv("STORAGE_BUCKET")
+                   return f"s3://{bucket}/delta/stocks/{nome}_{formatado}.parquet"
+             #elif enviroment == 'prod'
+             #    os.getenv("STORAGE_BUCKET_PROD")
+    else:
+      raise NotImplementedError('prod not configured yet')
+      
 
 def validar_schema(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
     """
@@ -140,6 +161,7 @@ def busca_acao(acao: list, start_date: str, end_date: str = formatado):
         time.sleep(10)
 
     logger.info('extracao finalizada')
+
 
 
 if __name__ == '__main__':
