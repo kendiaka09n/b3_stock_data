@@ -7,7 +7,7 @@ ENV UV_SYSTEM_PYTHON=1
 WORKDIR /app
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /uvx /bin/
 
 # Copy BOTH files (the two-stage cache trick still applies!)
 COPY pyproject.toml uv.lock ./

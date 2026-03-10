@@ -1,5 +1,40 @@
 services:
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s   # testa a cada 10 segundos
+      timeout: 5s     # espera 5s por resposta
+      retries: 5      # tenta 5 vezes antes de marcar como unhealthy
+
+  minio-setup:
+    image: minio/mc:latest
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} &&
+      mc mb --ignore-existing local/${STORAGE_BUCKET} &&
+      echo 'bucket pronto' "
+    depends_on:
+      minio:
+        condition: service_healthy              # espera healthcheck passar
+
   ingestion:
+    depends_on:
+      minio:
+        condition: service_healthy              # espera healthcheck passar
+      minio-setup:
+        condition: service_completed_successfully  # espera container terminar (exit 0)
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -8,3 +43,6 @@ services:
     env_file:
       - .env
     command: echo 'Conteiner Ready'
+
+volumes:
+  minio-data:
