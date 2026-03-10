@@ -1,5 +1,12 @@
-#raw_info
+# project-specific
 data/
+logs/
+BBAS3.SA
+hello.py
+
+# internal development docs (not for public repo)
+CLAUDE.md
+guides/SESSION.md
 
 # compiled / optimized / DLL files
 __pycache__/
